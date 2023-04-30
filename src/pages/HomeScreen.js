@@ -6,7 +6,7 @@ function HomeScreen({ navigation }) {
       <Text>Главный экран</Text>
       <Button
         title="Рассчитать"
-        onPress={() => navigation.navigate('Calculator')}
+        onPress={() => navigation.navigate('Создание товара')}
       />
       <Button
         title="Сохраненное"
