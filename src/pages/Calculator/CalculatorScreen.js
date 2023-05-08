@@ -1,54 +1,91 @@
-import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, ScrollView, LayoutAnimation, Button, Pressable } from 'react-native';
-import { StyleSheet, TouchableWithoutFeedback } from 'react-native-web';
+import React, { useMemo, useState } from 'react';
+import { View, TextInput, TouchableOpacity, Text, ScrollView, LayoutAnimation, Pressable } from 'react-native';
+import { StyleSheet } from 'react-native-web';
 
-const CalculatorScreen = ({ navigation }) => {
-  const [result, setResult] = useState('');
-  const [outcomeBtn, setOutcomeBtn] = useState('+');
-
-  const [nds, setNds] = useState('');
-  const [productionCost, setProductionCost] = useState('');
-  const [sellPrice, setSellPrice] = useState('');
-  // const [productName, setProductName] = useState('');
-  const [packingCost, setPackingCost] = useState('');
-  const [shippingCost, setShippingCost] = useState('');
-  const [otherCosts, setOtherCosts] = useState('');
-  const [incomeAmount, setIncomeAmount] = useState('');
-  const [incomePercentage, setIncomePercentage] = useState('');
-  const [feeAmount, setFeeAmount] = useState('');
-  const [feePercentage, setFeePercentage] = useState('');
+const CalculatorScreen = () => {
+  const [nds, setNds] = useState(0);
+  const [productionCost, setProductionCost] = useState(0);
+  const [sellPrice, setSellPrice] = useState(0);
+  const [packingCost, setPackingCost] = useState(0);
+  const [shippingCost, setShippingCost] = useState(0);
+  const [otherCosts, setOtherCosts] = useState(0);
+  const [incomeAmount, setIncomeAmount] = useState(0);
+  const [incomePercentage, setIncomePercentage] = useState(0);
+  const [feeAmount, setFeeAmount] = useState(0);
+  const [feePercentage, setFeePercentage] = useState(0);
+  const [ndsSum, setNdsSum] = useState(0);
   const [isOpenIncomeOutcome, setIsOpenIncomeOutcome] = useState(true);
-  const [isOpenIncome, setIsOpenIncome] = useState(true);
+  const [isOpenOutcome, setIsOpenOutcome] = useState(true);
 
+  const blockHeightIncomeOutcome = isOpenIncomeOutcome ? null : 0;
+  const blockHeightIncome = isOpenOutcome ? null : 0;
 
   const toggleBlockIncomeOutcome = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setIsOpenIncomeOutcome(!isOpenIncomeOutcome);
-    return { paddingBottom: 10 }
   };
 
   const toggleBlockIncome = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsOpenIncome(!isOpenIncome);
-
+    setIsOpenOutcome(!isOpenOutcome);
   };
 
-  const blockHeightIncomeOutcome = isOpenIncomeOutcome ? null : 0;
-  const blockHeightIncome = isOpenIncome ? null : 0;
-
+  const incomeResult = useMemo(() => {
+    let fee = 0;
+    let percentage = 0;
+  
+  
+    if (sellPrice >= 0 && sellPrice <= 49800) {
+      fee = sellPrice * 20 / 100;
+      percentage = 20;
+    } else if (sellPrice > 49800 && sellPrice <= 99800) {
+      fee = sellPrice * 18 / 100;
+      percentage = 18;
+    } else if (sellPrice > 99800 && sellPrice <= 149800) {
+      fee = sellPrice * 15 / 100;
+      percentage = 15;
+    } else if (sellPrice > 149800 && sellPrice <= 199800) {
+      fee = sellPrice * 12 / 100;
+      percentage = 12;
+    } else if (sellPrice > 199800 && sellPrice <= 299800) {
+      fee = sellPrice * 10 / 100;
+      percentage = 10;
+    } else if (sellPrice > 299800 && sellPrice <= 399800) {
+      fee = sellPrice * 8 / 100;
+      percentage = 8;
+    } else if (sellPrice > 399800 && sellPrice <= 699800) {
+      fee = sellPrice * 7 / 100;
+      percentage = 7;
+    } else if (sellPrice > 699800 && sellPrice <= 999800) {
+      fee = sellPrice * 6 / 100;
+      percentage = 6;
+    } else if (sellPrice > 999800 && sellPrice <= 2998800) {
+      fee = sellPrice * 5 / 100;
+      percentage = 5;
+    } else if (sellPrice > 2998800) {
+      fee = sellPrice * 3 / 100;
+      percentage = 3;
+    }
+  
+    setFeeAmount(fee);
+    setFeePercentage(percentage);
+    setNdsSum(sellPrice * nds / 100);
+    setIncomeAmount(sellPrice - packingCost - shippingCost - otherCosts - ndsSum - feeAmount - productionCost);
+  }, [productionCost, feeAmount, sellPrice, shippingCost, otherCosts, nds, packingCost, ndsSum]);
 
   return (
-    <ScrollView style={{ backgroundColor: '#DFDFFF' }}>
+    <ScrollView
+      style={{ backgroundColor: '#DFDFFF' }}
+      keyboardDismissMode='on-drag'
+    >
       <View style={styles.container}>
-
         <View style={styles.inputContainer}>
           <Text style={styles.rowText}>Себестоимость</Text>
           <TextInput
             inputMode='numeric'
             style={styles.input}
-            value={productionCost}
             onChangeText={setProductionCost}
-            placeholder="Введите себестоимость товара"
+            placeholder={`${productionCost}`}
           />
           <Text style={{ marginTop: -27, marginBottom: 12, marginLeft: 300 }}>som</Text>
         </View>
@@ -59,11 +96,10 @@ const CalculatorScreen = ({ navigation }) => {
             <TextInput
               inputMode='numeric'
               style={[styles.input, { width: 300 }]}
-              value={sellPrice}
               onChangeText={setSellPrice}
-              placeholder="Введите цену продажи товара"
+              placeholder={`${sellPrice}`}
             />
-            <TouchableOpacity style={{ width: 35, height: 35, alignItems: 'center', justifyContent: 'center' , borderWidth: 1, borderRadius: 6, marginLeft: 5 }}><Text style={{ fontSize: 18, }}>%</Text></TouchableOpacity>
+            <TouchableOpacity style={{ width: 35, height: 35, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, marginLeft: 5 }}><Text style={{ fontSize: 18, }}>%</Text></TouchableOpacity>
           </View>
 
           <Text style={{ marginTop: -27, marginBottom: 12, marginLeft: 260 }}>som</Text>
@@ -83,22 +119,19 @@ const CalculatorScreen = ({ navigation }) => {
               <View style={styles.rowContainerBig}>
                 <Text style={styles.inputText}>Прибыль:</Text>
                 <TextInput
-                  inputMode='numeric'
-                  style={styles.inputSmall}
-                  value={incomeAmount}
-                  onChangeText={setIncomeAmount}
-                  placeholder=""
+                  style={styles.input}
+                  value={`${incomeAmount}`}
+                  readOnly={true}
                 />
                 <Text style={{ marginTop: -29, marginBottom: 18, marginLeft: 280 }}>som</Text>
 
                 <TextInput
-                  inputMode='numeric'
-                  style={styles.inputSmall}
-                  value={incomePercentage}
-                  onChangeText={setIncomePercentage}
-                  placeholder="">
+                  style={styles.input}
+                  value={`${incomePercentage}`}
+                  readOnly={true}
+                >
                 </TextInput>
-                <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 280 }}>som</Text>
+                <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 300 }}>%</Text>
               </View>
             </View>
 
@@ -107,22 +140,18 @@ const CalculatorScreen = ({ navigation }) => {
                 <Text style={styles.inputText}>Комиссия:</Text>
 
                 <TextInput
-                  inputMode='numeric'
-                  style={styles.inputSmall}
-                  value={feeAmount}
-                  onChangeText={setFeeAmount}
-                  placeholder=""
+                  style={styles.input}
+                  value={`${feeAmount}`}
+                  readOnly={true}
                 />
                 <Text style={{ marginTop: -29, marginBottom: 18, marginLeft: 280 }}>som</Text>
 
                 <TextInput
-                  inputMode='numeric'
-                  style={styles.inputSmall}
-                  value={feePercentage}
-                  onChangeText={setFeePercentage}
-                  placeholder=""
+                  style={styles.input}
+                  value={`${feePercentage}`}
+                  readOnly={true}
                 />
-                <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 280 }}>som</Text>
+                <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 300 }}>%</Text>
               </View>
             </View>
 
@@ -131,10 +160,9 @@ const CalculatorScreen = ({ navigation }) => {
                 <Text style={styles.inputText}>Сумма НДС:</Text>
 
                 <TextInput
-                  style={styles.inputSmall}
-                  value={shippingCost}
-                  onChangeText={setShippingCost}
-                  placeholder=""
+                  style={styles.input}
+                  value={`${ndsSum}`}
+                  readOnly={true}
                 />
 
                 <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 280 }}>som</Text>
@@ -143,25 +171,36 @@ const CalculatorScreen = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={[styles.inputContainer, { paddingBottom: isOpenIncomeOutcome ? null : 10 }]}>
+        <View style={[styles.inputContainer, { paddingBottom: isOpenOutcome ? null : 10 }]}>
           <Pressable onPress={toggleBlockIncome} style={{ flexDirection: 'row', alignContent: 'center' }}>
             <View style={{ flexDirection: 'row', alignContent: 'center' }}>
               <Text style={styles.rowText}>Расходы</Text>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', marginLeft: 260 }}>{isOpenIncome ? '-' : '+'}</Text>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', marginLeft: 260 }}>{isOpenOutcome ? '-' : '+'}</Text>
             </View>
           </Pressable>
 
           <View style={{ height: blockHeightIncome, overflow: 'hidden' }}>
             <View style={styles.row}>
-              <View style={styles.rowContainerBig}>
+              <View style={styles.rowContainerSmall}>
+                <Text style={styles.inputText}>НДС:</Text>
+
+                <TextInput
+                  inputMode='numeric'
+                  style={styles.input}
+                  placeholder={`${nds}`}
+                  onChangeText={setNds}
+                />
+                <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 280 }}>som</Text>
+              </View>
+
+              <View style={styles.rowContainerSmall}>
                 <Text style={styles.inputText}>Упаковка:</Text>
 
                 <TextInput
                   inputMode='numeric'
-                  style={styles.inputSmall}
-                  value={packingCost}
+                  style={styles.input}
+                  placeholder={`${packingCost}`}
                   onChangeText={setPackingCost}
-                  placeholder=""
                 />
                 <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 280 }}>som</Text>
               </View>
@@ -173,10 +212,9 @@ const CalculatorScreen = ({ navigation }) => {
 
                 <TextInput
                   inputMode='numeric'
-                  style={styles.inputSmall}
-                  value={shippingCost}
+                  style={styles.input}
+                  placeholder={`${shippingCost}`}
                   onChangeText={setShippingCost}
-                  placeholder=""
                 />
                 <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 115 }}>som</Text>
               </View>
@@ -186,10 +224,9 @@ const CalculatorScreen = ({ navigation }) => {
 
                 <TextInput
                   inputMode='numeric'
-                  style={styles.inputSmall}
-                  value={otherCosts}
+                  style={styles.input}
+                  placeholder={`${otherCosts}`}
                   onChangeText={setOtherCosts}
-                  placeholder=""
                 />
                 <Text style={{ marginTop: -29, marginBottom: 12, marginLeft: 115 }}>som</Text>
               </View>
@@ -250,13 +287,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderRadius: 4,
     padding: 5,
-  },
-
-  inputSmall: {
-    height: 40,
-    borderBottomWidth: 1,
-    borderRadius: 4,
-    padding: 0,
   },
 
   inputText: {
