@@ -3,6 +3,7 @@ import { View, TextInput, TouchableOpacity, Text, ScrollView, LayoutAnimation, P
 import { StyleSheet } from 'react-native-web';
 
 const CalculatorScreen = () => {
+
   const [nds, setNds] = useState(0);
   const [productionCost, setProductionCost] = useState(0);
   const [sellPrice, setSellPrice] = useState(0);
@@ -16,7 +17,6 @@ const CalculatorScreen = () => {
   const [ndsSum, setNdsSum] = useState(0);
   const [isOpenIncomeOutcome, setIsOpenIncomeOutcome] = useState(true);
   const [isOpenOutcome, setIsOpenOutcome] = useState(true);
-
   const blockHeightIncomeOutcome = isOpenIncomeOutcome ? null : 0;
   const blockHeightIncome = isOpenOutcome ? null : 0;
 
@@ -33,8 +33,7 @@ const CalculatorScreen = () => {
   const incomeResult = useMemo(() => {
     let fee = 0;
     let percentage = 0;
-  
-  
+
     if (sellPrice >= 0 && sellPrice <= 49800) {
       fee = sellPrice * 20 / 100;
       percentage = 20;
@@ -66,11 +65,12 @@ const CalculatorScreen = () => {
       fee = sellPrice * 3 / 100;
       percentage = 3;
     }
-  
+
     setFeeAmount(fee);
     setFeePercentage(percentage);
     setNdsSum(sellPrice * nds / 100);
-    setIncomeAmount(sellPrice - packingCost - shippingCost - otherCosts - ndsSum - feeAmount - productionCost);
+    setIncomeAmount((sellPrice - packingCost - shippingCost - otherCosts - ndsSum - feeAmount - productionCost).toFixed(2));
+    setIncomePercentage(((sellPrice - packingCost - shippingCost - otherCosts - ndsSum - feeAmount - productionCost) / productionCost * 100).toFixed(2));
   }, [productionCost, feeAmount, sellPrice, shippingCost, otherCosts, nds, packingCost, ndsSum]);
 
   return (
@@ -81,13 +81,15 @@ const CalculatorScreen = () => {
       <View style={styles.container}>
         <View style={styles.inputContainer}>
           <Text style={styles.rowText}>Себестоимость</Text>
-          <TextInput
-            inputMode='numeric'
-            style={styles.input}
-            onChangeText={setProductionCost}
-            placeholder={`${productionCost}`}
-          />
-          <Text style={{ marginTop: -27, marginBottom: 12, marginLeft: 300 }}>som</Text>
+          <View style={styles.row}>
+            <TextInput
+              inputMode='numeric'
+              style={[styles.input, { width: 340 }]}
+              onChangeText={setProductionCost}
+              placeholder={`${productionCost}`}
+            />
+            <Text style={{ marginBottom: 10, marginLeft: -40 }}>som</Text>
+          </View>
         </View>
 
         <View style={styles.inputContainer}>
@@ -100,9 +102,10 @@ const CalculatorScreen = () => {
               placeholder={`${sellPrice}`}
             />
             <TouchableOpacity style={{ width: 35, height: 35, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 6, marginLeft: 5 }}><Text style={{ fontSize: 18, }}>%</Text></TouchableOpacity>
+            <Text style={{ marginBottom: 10, marginLeft: -85 }}>som</Text>
           </View>
 
-          <Text style={{ marginTop: -27, marginBottom: 12, marginLeft: 260 }}>som</Text>
+
 
         </View>
 

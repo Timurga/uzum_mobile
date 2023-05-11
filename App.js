@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import CalculatorScreen from './src/pages/Calculator/CalculatorScreen';
-import HomeScreen from './src/pages/HomeScreen';
-import ResultScreen from './src/pages/ResultScreen';
+import CalculatorScreen from './src/screens/Calculator/CalculatorScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import ResultScreen from './src/screens/ResultScreen';
 
 const Stack = createStackNavigator();
 
